@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  Anchor,
   Badge,
   Button,
   Container,
@@ -124,9 +122,6 @@ export function InvoicesPage() {
       <Group justify="space-between" mb="md">
         <Title order={2}>Invoices</Title>
         <Group>
-          <Anchor component={Link} to="/" size="sm">
-            Home
-          </Anchor>
           <Button variant="default" onClick={() => void handleExport()}>
             Export CSV
           </Button>

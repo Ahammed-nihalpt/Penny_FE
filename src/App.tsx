@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '@/pages/LoginPage';
 import { SignupPage } from '@/pages/SignupPage';
-import { HomePage } from '@/pages/HomePage';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { InvoicesPage } from '@/features/invoices/InvoicesPage';
+import { AppLayout } from '@/components/AppLayout';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { useAuthStore } from '@/auth/authStore';
 
@@ -18,21 +19,15 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route
-        path="/"
         element={
           <ProtectedRoute>
-            <HomePage />
+            <AppLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/invoices"
-        element={
-          <ProtectedRoute>
-            <InvoicesPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/invoices" element={<InvoicesPage />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

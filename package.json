@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/charts": "^9.3.0",
     "@mantine/core": "^9.3.0",
     "@mantine/form": "^9.3.0",
     "@mantine/hooks": "^9.3.0",
@@ -22,6 +23,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.17.0",
+    "recharts": "^3.8.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
