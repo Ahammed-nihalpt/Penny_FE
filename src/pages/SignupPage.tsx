@@ -14,10 +14,11 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '@/auth/useAuth';
+import { useAuthStore } from '@/auth/authStore';
 
 export function SignupPage() {
-  const { signup, loginWithGoogle } = useAuth();
+  const signup = useAuthStore((s) => s.signup);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const form = useForm({

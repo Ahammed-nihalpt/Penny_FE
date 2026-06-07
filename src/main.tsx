@@ -8,7 +8,6 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import { theme } from '@/theme';
 import { App } from '@/App';
-import { AuthProvider } from '@/auth/AuthContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,9 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <MantineProvider theme={theme} defaultColorScheme="light">
         <Notifications />
         <BrowserRouter>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
+          <App />
         </BrowserRouter>
       </MantineProvider>
     </GoogleOAuthProvider>
