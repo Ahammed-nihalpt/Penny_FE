@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Container,
+  FileButton,
   Group,
   SegmentedControl,
   Table,
@@ -14,10 +15,12 @@ import {
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
+import { AxiosError } from 'axios';
 import { api } from '@/lib/api';
 import { useInvoicesStore } from '@/features/invoices/invoicesStore';
+import { invoicesApi } from '@/features/invoices/invoicesApi';
 import { InvoiceFormModal } from '@/features/invoices/InvoiceFormModal';
-import type { Invoice, InvoiceFilter } from '@/features/invoices/types';
+import type { CreateInvoiceInput, Invoice, InvoiceFilter } from '@/features/invoices/types';
 
 const FILTERS: { label: string; value: InvoiceFilter }[] = [
   { label: 'All', value: 'all' },
@@ -37,7 +40,10 @@ export function InvoicesPage() {
   const remove = useInvoicesStore((s) => s.remove);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalKey, setModalKey] = useState(0);
   const [editing, setEditing] = useState<Invoice | null>(null);
+  const [prefill, setPrefill] = useState<Partial<CreateInvoiceInput> | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch] = useDebouncedValue(searchInput, 300);
 
@@ -66,14 +72,44 @@ export function InvoicesPage() {
       .catch(() => notifications.show({ color: 'red', message: 'Could not update' }));
   };
 
+  const openModal = () => {
+    setModalKey((k) => k + 1);
+    setModalOpen(true);
+  };
+
   const openAdd = () => {
     setEditing(null);
-    setModalOpen(true);
+    setPrefill(null);
+    openModal();
   };
 
   const openEdit = (inv: Invoice) => {
     setEditing(inv);
-    setModalOpen(true);
+    setPrefill(null);
+    openModal();
+  };
+
+  const handleUpload = (file: File | null) => {
+    if (!file) return;
+    setUploading(true);
+    invoicesApi
+      .upload(file)
+      .then((draft) => {
+        setEditing(null);
+        setPrefill(draft);
+        openModal();
+      })
+      .catch((err: unknown) => {
+        const status = err instanceof AxiosError ? err.response?.status : undefined;
+        const message =
+          status === 503
+            ? 'Vision is not configured (set GEMINI_API_KEY on the server)'
+            : status === 422
+              ? "Couldn't read this invoice — try a clearer photo or add it manually"
+              : 'Upload failed';
+        notifications.show({ color: 'red', message });
+      })
+      .finally(() => setUploading(false));
   };
 
   const handleDelete = (inv: Invoice) => {
@@ -94,6 +130,16 @@ export function InvoicesPage() {
           <Button variant="default" onClick={() => void handleExport()}>
             Export CSV
           </Button>
+          <FileButton
+            onChange={handleUpload}
+            accept="image/png,image/jpeg,image/webp,application/pdf"
+          >
+            {(props) => (
+              <Button {...props} variant="light" loading={uploading}>
+                Upload invoice
+              </Button>
+            )}
+          </FileButton>
           <Button onClick={openAdd}>Add invoice</Button>
         </Group>
       </Group>
@@ -131,9 +177,7 @@ export function InvoicesPage() {
             {invoices.map((inv) => (
               <Table.Tr key={inv._id}>
                 <Table.Td>{inv.vendor}</Table.Td>
-                <Table.Td>
-                  {inv.currency} {inv.amount.toFixed(2)}
-                </Table.Td>
+                <Table.Td>{inv.amount.toFixed(2)}</Table.Td>
                 <Table.Td>{inv.category}</Table.Td>
                 <Table.Td>{inv.dueDate.slice(0, 10)}</Table.Td>
                 <Table.Td>
@@ -166,10 +210,11 @@ export function InvoicesPage() {
       )}
 
       <InvoiceFormModal
-        key={editing?._id ?? 'new'}
+        key={modalKey}
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
         invoice={editing}
+        prefill={prefill}
       />
     </Container>
   );

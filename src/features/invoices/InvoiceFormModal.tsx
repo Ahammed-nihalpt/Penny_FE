@@ -3,30 +3,34 @@ import { Button, Modal, NumberInput, Select, Stack, TextInput } from '@mantine/c
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { INVOICE_CATEGORIES } from '@/features/invoices/types';
-import type { Invoice, InvoiceCategory } from '@/features/invoices/types';
+import type { CreateInvoiceInput, Invoice, InvoiceCategory } from '@/features/invoices/types';
 import { useInvoicesStore } from '@/features/invoices/invoicesStore';
 
 interface Props {
   opened: boolean;
   onClose: () => void;
   invoice?: Invoice | null;
+  prefill?: Partial<CreateInvoiceInput> | null;
 }
 
-export function InvoiceFormModal({ opened, onClose, invoice }: Props) {
+export function InvoiceFormModal({ opened, onClose, invoice, prefill }: Props) {
   const create = useInvoicesStore((s) => s.create);
   const update = useInvoicesStore((s) => s.update);
   const [busy, setBusy] = useState(false);
   const isEdit = Boolean(invoice);
 
-  // The page passes a changing `key`, so this component remounts per invoice
-  // and these initial values reflect the row being edited (or a blank add form).
+  // The page passes a changing `key`, so this component remounts per invoice/draft
+  // and these initial values reflect the row being edited, a vision-extracted draft,
+  // or a blank add form.
+  const source = invoice ?? prefill ?? null;
+  const initialDue = invoice ? invoice.dueDate.slice(0, 10) : (prefill?.dueDate ?? '');
   const form = useForm({
     initialValues: {
-      vendor: invoice?.vendor ?? '',
-      amount: invoice?.amount ?? 0,
-      category: invoice?.category ?? 'Other',
-      dueDate: invoice ? invoice.dueDate.slice(0, 10) : '',
-      email: invoice?.email ?? '',
+      vendor: source?.vendor ?? '',
+      amount: source?.amount ?? 0,
+      category: source?.category ?? 'Other',
+      dueDate: initialDue,
+      email: source?.email ?? '',
     },
     validate: {
       vendor: (v) => (v.trim() ? null : 'Required'),

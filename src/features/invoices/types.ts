@@ -17,7 +17,6 @@ export interface Invoice {
   vendor: string;
   email?: string;
   amount: number;
-  currency: string;
   category: InvoiceCategory;
   dueDate: string;
   issuedDate?: string;
@@ -34,3 +33,13 @@ export interface CreateInvoiceInput {
 }
 
 export type UpdateInvoiceInput = Partial<CreateInvoiceInput>;
+
+export interface InvoiceDraft {
+  vendor: string;
+  email?: string;
+  amount: number;
+  category: InvoiceCategory;
+  dueDate: string;
+  issuedDate?: string;
+  sourceFile?: string;
+}
