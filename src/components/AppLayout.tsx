@@ -22,6 +22,7 @@ export function AppLayout() {
             </Text>
             {navLink('/', 'Dashboard')}
             {navLink('/invoices', 'Invoices')}
+            {navLink('/chat', 'Copilot')}
           </Group>
           <Button variant="default" size="sm" onClick={() => void logout()}>
             Log out
