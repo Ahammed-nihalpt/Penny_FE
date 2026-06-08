@@ -1,4 +1,4 @@
-# Penny — Invoice Copilot (Frontend)
+# AskPenny — Invoice Copilot (Frontend)
 
 > The web client for **Penny**, an AI invoice copilot for non‑technical small‑business owners.
 > Built to feel warm and approachable for a 35+, not‑very‑technical audience — not like a

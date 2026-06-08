@@ -33,7 +33,7 @@ export function AppLayout() {
     <Group gap={8}>
       <PennyMark size={26} />
       <Text fw={700} size="lg" c="copper.7" style={{ letterSpacing: '-0.4px' }}>
-        Penny
+        AskPenny
       </Text>
     </Group>
   );

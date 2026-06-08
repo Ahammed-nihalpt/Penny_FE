@@ -18,7 +18,7 @@ export function AuthShell({ title, tagline, children }: AuthShellProps) {
           <Group gap={8}>
             <PennyMark size={34} />
             <Text fw={700} fz={28} c="copper.7" style={{ letterSpacing: '-0.5px' }}>
-              Penny
+              AskPenny
             </Text>
           </Group>
           <Title order={2} ta="center" fw={600}>

@@ -89,7 +89,7 @@ export function LandingPage() {
           <Group gap={8}>
             <PennyMark size={28} />
             <Text fw={700} fz="lg" c="copper.7" style={{ letterSpacing: '-0.4px' }}>
-              Penny
+              AskPenny
             </Text>
           </Group>
           <Group gap="xs">
