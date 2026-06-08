@@ -3,8 +3,10 @@ import {
   ActionIcon,
   Badge,
   Box,
+  Burger,
   Button,
   Divider,
+  Drawer,
   Group,
   Loader,
   Paper,
@@ -13,6 +15,7 @@ import {
   Text,
   Textarea,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useChatStore } from '@/features/chat/chatStore';
 import { useInvoicesStore } from '@/features/invoices/invoicesStore';
 import { ModelPicker } from '@/features/models/ModelPicker';
@@ -140,6 +143,8 @@ export function CopilotPage() {
   const loadInvoices = useInvoicesStore((s) => s.load);
 
   const [input, setInput] = useState('');
+  // Mobile-only: the sessions list lives in a slide-in drawer.
+  const [navOpen, { open: openNav, close: closeNav }] = useDisclosure(false);
   const viewport = useRef<HTMLDivElement>(null);
   const invoiceById = useMemo(() => new Map(invoices.map((i) => [i._id, i])), [invoices]);
   // Show the typing/Stop state only for the chat you're actually looking at.
@@ -171,86 +176,107 @@ export function CopilotPage() {
     void send(text);
   };
 
+  const sessionList = (
+    <Stack gap={2}>
+      {sessions.length === 0 ? (
+        <Text c="dimmed" size="xs" ta="center" py="sm">
+          No chats yet.
+        </Text>
+      ) : (
+        sessions.map((s) => {
+          const active = s._id === activeId;
+          return (
+            <Group key={s._id} className="penny-session" gap={2} wrap="nowrap" align="center">
+              <Button
+                variant={active ? 'light' : 'subtle'}
+                color={active ? 'teal' : 'gray'}
+                justify="flex-start"
+                size="sm"
+                radius="md"
+                h="auto"
+                py={6}
+                style={{ flex: 1, minWidth: 0 }}
+                onClick={() => {
+                  void select(s._id);
+                  closeNav();
+                }}
+              >
+                <Stack gap={0} align="flex-start" style={{ minWidth: 0, width: '100%' }}>
+                  <Text truncate size="sm" fw={active ? 600 : 500} style={{ maxWidth: '100%' }}>
+                    {s.title}
+                  </Text>
+                  {fmtRelative(s.updatedAt) ? (
+                    <Text size="xs" c="dimmed" fw={400}>
+                      {fmtRelative(s.updatedAt)}
+                    </Text>
+                  ) : null}
+                </Stack>
+              </Button>
+              <ActionIcon
+                className="penny-session__del"
+                variant="subtle"
+                color="gray"
+                size="sm"
+                aria-label="Delete chat"
+                onClick={() => void remove(s._id)}
+              >
+                ×
+              </ActionIcon>
+            </Group>
+          );
+        })
+      )}
+    </Stack>
+  );
+
+  const sessionsBody = (scroll: boolean) => (
+    <>
+      <Button
+        onClick={() => {
+          void newChat();
+          closeNav();
+        }}
+        variant="light"
+        radius="md"
+        mb="xs"
+      >
+        + New chat
+      </Button>
+      {sessions.length > 0 ? (
+        <Text
+          size="xs"
+          tt="uppercase"
+          fw={600}
+          c="dimmed"
+          px={6}
+          mb={4}
+          style={{ letterSpacing: '0.5px' }}
+        >
+          Recent
+        </Text>
+      ) : null}
+      {scroll ? <ScrollArea style={{ flex: 1 }}>{sessionList}</ScrollArea> : sessionList}
+    </>
+  );
+
   return (
-    <Group align="stretch" gap="md" h="calc(100vh - 2rem)" wrap="nowrap">
-      {/* Sessions */}
+    <Group align="stretch" gap="md" wrap="nowrap" className="copilot-shell">
+      <Drawer opened={navOpen} onClose={closeNav} title="Chats" size="78%" padding="md">
+        <Stack gap={4} h="calc(100dvh - 120px)">
+          {sessionsBody(false)}
+        </Stack>
+      </Drawer>
+
+      {/* Sessions (desktop sidebar; mobile uses the Drawer above) */}
       <Paper
         withBorder
         radius="lg"
         p="sm"
         w={240}
+        visibleFrom="sm"
         style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' }}
       >
-        <Button onClick={() => void newChat()} variant="light" radius="md" mb="xs">
-          + New chat
-        </Button>
-        {sessions.length > 0 ? (
-          <Text
-            size="xs"
-            tt="uppercase"
-            fw={600}
-            c="dimmed"
-            px={6}
-            mb={4}
-            style={{ letterSpacing: '0.5px' }}
-          >
-            Recent
-          </Text>
-        ) : null}
-        <ScrollArea style={{ flex: 1 }}>
-          <Stack gap={2}>
-            {sessions.length === 0 ? (
-              <Text c="dimmed" size="xs" ta="center" py="sm">
-                No chats yet.
-              </Text>
-            ) : (
-              sessions.map((s) => {
-                const active = s._id === activeId;
-                return (
-                  <Group key={s._id} className="penny-session" gap={2} wrap="nowrap" align="center">
-                    <Button
-                      variant={active ? 'light' : 'subtle'}
-                      color={active ? 'teal' : 'gray'}
-                      justify="flex-start"
-                      size="sm"
-                      radius="md"
-                      h="auto"
-                      py={6}
-                      style={{ flex: 1, minWidth: 0 }}
-                      onClick={() => void select(s._id)}
-                    >
-                      <Stack gap={0} align="flex-start" style={{ minWidth: 0, width: '100%' }}>
-                        <Text
-                          truncate
-                          size="sm"
-                          fw={active ? 600 : 500}
-                          style={{ maxWidth: '100%' }}
-                        >
-                          {s.title}
-                        </Text>
-                        {fmtRelative(s.updatedAt) ? (
-                          <Text size="xs" c="dimmed" fw={400}>
-                            {fmtRelative(s.updatedAt)}
-                          </Text>
-                        ) : null}
-                      </Stack>
-                    </Button>
-                    <ActionIcon
-                      className="penny-session__del"
-                      variant="subtle"
-                      color="gray"
-                      size="sm"
-                      aria-label="Delete chat"
-                      onClick={() => void remove(s._id)}
-                    >
-                      ×
-                    </ActionIcon>
-                  </Group>
-                );
-              })
-            )}
-          </Stack>
-        </ScrollArea>
+        {sessionsBody(true)}
       </Paper>
 
       {/* Conversation */}
@@ -267,6 +293,13 @@ export function CopilotPage() {
       >
         <Group justify="space-between" align="center" wrap="nowrap" px="md" py="sm" bg="copper.0">
           <Group gap={10} wrap="nowrap">
+            <Burger
+              opened={navOpen}
+              onClick={openNav}
+              size="sm"
+              hiddenFrom="sm"
+              aria-label="Chats"
+            />
             <Box style={{ position: 'relative', lineHeight: 0 }}>
               <PennyMark size={30} />
               <Box
