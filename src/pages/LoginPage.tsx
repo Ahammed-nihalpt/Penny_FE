@@ -24,7 +24,7 @@ export function LoginPage() {
     setBusy(true);
     try {
       await login(values);
-      void navigate('/');
+      void navigate('/dashboard');
     } catch {
       notifications.show({ color: 'red', message: 'Invalid email or password' });
     } finally {
@@ -35,7 +35,7 @@ export function LoginPage() {
   const onGoogle = (credential?: string) => {
     if (!credential) return;
     loginWithGoogle(credential)
-      .then(() => navigate('/'))
+      .then(() => navigate('/dashboard'))
       .catch(() => notifications.show({ color: 'red', message: 'Google sign-in failed' }));
   };
 

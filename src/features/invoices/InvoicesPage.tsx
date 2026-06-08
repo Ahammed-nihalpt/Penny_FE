@@ -20,7 +20,6 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { AxiosError } from 'axios';
-import { api } from '@/lib/api';
 import { PennyMark } from '@/components/PennyMark';
 import { useInvoicesStore } from '@/features/invoices/invoicesStore';
 import { invoicesApi } from '@/features/invoices/invoicesApi';
@@ -74,11 +73,6 @@ const UploadIcon = () => (
     <path d="M12 15V3M7 8l5-5 5 5M5 21h14" />
   </Icon>
 );
-const DownloadIcon = () => (
-  <Icon>
-    <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
-  </Icon>
-);
 const SearchIcon = () => (
   <Icon size={15}>
     <circle cx="11" cy="11" r="7" />
@@ -123,20 +117,6 @@ export function InvoicesPage() {
     setSearch(debouncedSearch);
     void load();
   }, [debouncedSearch, setSearch, load]);
-
-  const handleExport = async () => {
-    try {
-      const res = await api.get('/invoices/export', { params: { filter }, responseType: 'blob' });
-      const url = URL.createObjectURL(res.data as Blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'invoices.csv';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      notifications.show({ color: 'red', message: 'Export failed' });
-    }
-  };
 
   const handleMarkPaid = (id: string) => {
     markPaid(id)
@@ -211,13 +191,6 @@ export function InvoicesPage() {
             </Group>
           </Stack>
           <Group gap="xs">
-            <Button
-              variant="default"
-              leftSection={<DownloadIcon />}
-              onClick={() => void handleExport()}
-            >
-              Export
-            </Button>
             <FileButton
               onChange={handleUpload}
               accept="image/png,image/jpeg,image/webp,application/pdf"

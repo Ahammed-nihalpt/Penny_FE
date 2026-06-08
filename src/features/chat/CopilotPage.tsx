@@ -185,7 +185,15 @@ export function CopilotPage() {
           + New chat
         </Button>
         {sessions.length > 0 ? (
-          <Text size="xs" tt="uppercase" fw={600} c="dimmed" px={6} mb={4} style={{ letterSpacing: '0.5px' }}>
+          <Text
+            size="xs"
+            tt="uppercase"
+            fw={600}
+            c="dimmed"
+            px={6}
+            mb={4}
+            style={{ letterSpacing: '0.5px' }}
+          >
             Recent
           </Text>
         ) : null}
@@ -212,7 +220,12 @@ export function CopilotPage() {
                       onClick={() => void select(s._id)}
                     >
                       <Stack gap={0} align="flex-start" style={{ minWidth: 0, width: '100%' }}>
-                        <Text truncate size="sm" fw={active ? 600 : 500} style={{ maxWidth: '100%' }}>
+                        <Text
+                          truncate
+                          size="sm"
+                          fw={active ? 600 : 500}
+                          style={{ maxWidth: '100%' }}
+                        >
                           {s.title}
                         </Text>
                         {fmtRelative(s.updatedAt) ? (

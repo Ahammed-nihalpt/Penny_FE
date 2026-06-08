@@ -8,6 +8,9 @@ import { useAuthStore } from '@/auth/authStore';
 // Route-level code-splitting: each page becomes its own chunk, so the login
 // screen no longer ships the charts (Dashboard) or copilot bundles. Pages are
 // named exports, so we map the named export onto `default` for React.lazy.
+const LandingPage = lazy(() =>
+  import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
+);
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const SignupPage = lazy(() =>
   import('@/pages/SignupPage').then((m) => ({ default: m.SignupPage })),
@@ -37,6 +40,7 @@ export function App() {
   return (
     <Suspense fallback={PageFallback}>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route
@@ -46,7 +50,7 @@ export function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/chat" element={<CopilotPage />} />
         </Route>

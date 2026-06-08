@@ -25,7 +25,7 @@ export function SignupPage() {
     setBusy(true);
     try {
       await signup(values);
-      void navigate('/');
+      void navigate('/dashboard');
     } catch {
       notifications.show({ color: 'red', message: 'Could not sign up (email may be taken)' });
     } finally {
@@ -36,7 +36,7 @@ export function SignupPage() {
   const onGoogle = (credential?: string) => {
     if (!credential) return;
     loginWithGoogle(credential)
-      .then(() => navigate('/'))
+      .then(() => navigate('/dashboard'))
       .catch(() => notifications.show({ color: 'red', message: 'Google sign-in failed' }));
   };
 

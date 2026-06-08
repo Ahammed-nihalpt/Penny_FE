@@ -57,7 +57,7 @@ export function AppLayout() {
             <Group visibleFrom="sm" mb="md" px="xs">
               {brand}
             </Group>
-            {navLink('/', 'Dashboard')}
+            {navLink('/dashboard', 'Dashboard')}
             {navLink('/invoices', 'Invoices')}
             {navLink('/chat', 'Copilot')}
           </Stack>
