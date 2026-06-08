@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Penny — Invoice Copilot (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> The web client for **Penny**, an AI invoice copilot for non‑technical small‑business owners.
+> Built to feel warm and approachable for a 35+, not‑very‑technical audience — not like a
+> developer tool.
 
-Currently, two official plugins are available:
+This repository is the **React + TypeScript (Vite)** single‑page app. The API and AI service
+live in the companion repo **Penny_BE**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## What's here
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Auth** — branded login/signup, email/password + **Google sign‑in**, silent token refresh.
+- **Dashboard** — a "where your money stands" view: outstanding/overdue/paid, an overdue ring,
+  trend sparklines, a cash‑flow area chart, spend‑by‑category donut, and top vendors.
+- **Invoices** — table with status (paid / overdue / open), inline icon actions, CSV export, and
+  **upload‑to‑extract** (Gemini reads the image and pre‑fills the form).
+- **Copilot** — chat with Penny in a contained, modern chat UI: session list, grounded
+  "what Penny did" step traces under her replies, a live invoice panel that updates as she acts,
+  Stop button, inline error + retry, and a model picker.
 
-## Expanding the ESLint configuration
+## Tech stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19 + TypeScript**, **Vite**, **pnpm**
+- **Mantine** (UI + charts) with a custom warm "Penny" theme (teal + copper, Inter)
+- **Zustand** for state, **React Router** (route‑level code splitting), **axios** with a 401
+  silent‑refresh interceptor
+- **ESLint + Prettier**, **Vitest**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
+- Node.js 20+, `pnpm`
+- The backend (**Penny_BE**) running, by default at `http://localhost:3000/api`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Setup
+```bash
+pnpm install
+cp .env.example .env   # set VITE_API_URL and (optional) VITE_GOOGLE_CLIENT_ID
+pnpm run dev           # app on http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Scripts
+```bash
+pnpm run dev      # dev server (HMR)
+pnpm run build    # type-check + production build
+pnpm run lint     # eslint
+pnpm test         # vitest
+```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Environment variables
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Var | Purpose |
+| --- | --- |
+| `VITE_API_URL` | Backend base URL (default `http://localhost:3000/api`) |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth Web client ID (empty disables the Google button) |
+
+`.env` is git‑ignored; only `.env.example` (placeholders) is committed.
+
+## Project structure
+
+```
+src/
+  auth/         auth store, protected route
+  components/   AppLayout (sidebar), Penny coin mark
+  features/
+    dashboard/  charts + metrics
+    invoices/   table, form modal, store, API
+    chat/       copilot page, chat store, API
+    models/     model picker
+  pages/        login / signup (+ shared AuthShell)
+  theme.ts      warm teal + copper Mantine theme
 ```

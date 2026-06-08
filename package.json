@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
     "@mantine/charts": "^9.3.0",
     "@mantine/core": "^9.3.0",
     "@mantine/form": "^9.3.0",
@@ -22,8 +23,10 @@
     "axios": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.17.0",
     "recharts": "^3.8.1",
+    "remark-gfm": "^4.0.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { notifications } from '@mantine/notifications';
 import { invoicesApi } from '@/features/invoices/invoicesApi';
 import type {
   CreateInvoiceInput,
@@ -41,6 +42,8 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
     try {
       const invoices = await invoicesApi.list(get().filter, get().search);
       set({ invoices });
+    } catch {
+      notifications.show({ color: 'red', message: 'Couldn’t load your invoices.' });
     } finally {
       set({ loading: false });
     }

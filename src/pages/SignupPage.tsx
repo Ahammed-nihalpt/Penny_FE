@@ -1,20 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Anchor,
-  Button,
-  Container,
-  Divider,
-  Paper,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Anchor, Button, Divider, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '@/auth/authStore';
+import { AuthShell } from '@/pages/AuthShell';
 
 export function SignupPage() {
   const signup = useAuthStore((s) => s.signup);
@@ -50,30 +41,28 @@ export function SignupPage() {
   };
 
   return (
-    <Container size={420} py={80}>
-      <Title order={2} ta="center" mb="lg">
-        Create your Penny account
-      </Title>
-      <Paper withBorder shadow="sm" p="xl" radius="md">
-        <form onSubmit={submit}>
-          <Stack>
-            <TextInput label="Name" {...form.getInputProps('name')} />
-            <TextInput label="Email" {...form.getInputProps('email')} />
-            <PasswordInput label="Password" {...form.getInputProps('password')} />
-            <Button type="submit" loading={busy} fullWidth>
-              Sign up
-            </Button>
-          </Stack>
-        </form>
-        <Divider label="or" labelPosition="center" my="md" />
-        <GoogleLogin
-          onSuccess={(cred) => onGoogle(cred.credential)}
-          onError={() => notifications.show({ color: 'red', message: 'Google sign-in failed' })}
-        />
-        <Anchor component={Link} to="/login" size="sm" mt="md" display="block" ta="center">
-          Have an account? Log in
-        </Anchor>
-      </Paper>
-    </Container>
+    <AuthShell
+      title="Create your account"
+      tagline="Start turning invoices into answers in minutes."
+    >
+      <form onSubmit={submit}>
+        <Stack>
+          <TextInput label="Name" {...form.getInputProps('name')} />
+          <TextInput label="Email" {...form.getInputProps('email')} />
+          <PasswordInput label="Password" {...form.getInputProps('password')} />
+          <Button type="submit" loading={busy} fullWidth>
+            Sign up
+          </Button>
+        </Stack>
+      </form>
+      <Divider label="or" labelPosition="center" my="md" />
+      <GoogleLogin
+        onSuccess={(cred) => onGoogle(cred.credential)}
+        onError={() => notifications.show({ color: 'red', message: 'Google sign-in failed' })}
+      />
+      <Anchor component={Link} to="/login" size="sm" mt="md" display="block" ta="center">
+        Have an account? Log in
+      </Anchor>
+    </AuthShell>
   );
 }

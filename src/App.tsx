@@ -1,13 +1,32 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage } from '@/pages/LoginPage';
-import { SignupPage } from '@/pages/SignupPage';
-import { DashboardPage } from '@/features/dashboard/DashboardPage';
-import { InvoicesPage } from '@/features/invoices/InvoicesPage';
-import { CopilotPage } from '@/features/chat/CopilotPage';
+import { Center, Loader } from '@mantine/core';
 import { AppLayout } from '@/components/AppLayout';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { useAuthStore } from '@/auth/authStore';
+
+// Route-level code-splitting: each page becomes its own chunk, so the login
+// screen no longer ships the charts (Dashboard) or copilot bundles. Pages are
+// named exports, so we map the named export onto `default` for React.lazy.
+const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const SignupPage = lazy(() =>
+  import('@/pages/SignupPage').then((m) => ({ default: m.SignupPage })),
+);
+const DashboardPage = lazy(() =>
+  import('@/features/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+);
+const InvoicesPage = lazy(() =>
+  import('@/features/invoices/InvoicesPage').then((m) => ({ default: m.InvoicesPage })),
+);
+const CopilotPage = lazy(() =>
+  import('@/features/chat/CopilotPage').then((m) => ({ default: m.CopilotPage })),
+);
+
+const PageFallback = (
+  <Center h="60vh">
+    <Loader />
+  </Center>
+);
 
 export function App() {
   const init = useAuthStore((s) => s.init);
@@ -16,21 +35,23 @@ export function App() {
   }, [init]);
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/invoices" element={<InvoicesPage />} />
-        <Route path="/chat" element={<CopilotPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <Suspense fallback={PageFallback}>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/chat" element={<CopilotPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }

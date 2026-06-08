@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+export const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
 export const api = axios.create({ baseURL, withCredentials: true });
 
@@ -10,6 +10,7 @@ let accessToken: string | null = null;
 export const setAccessToken = (token: string | null): void => {
   accessToken = token;
 };
+export const getAccessToken = (): string | null => accessToken;
 
 // Exported for unit testing; attaches the bearer header when a token is set.
 export function attachAuthHeader(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {

@@ -5,7 +5,7 @@ import type { ModelsResponse } from '@/features/models/types';
 import { useChatStore } from '@/features/chat/chatStore';
 
 export function ModelPicker() {
-  const sending = useChatStore((s) => s.sending);
+  const sending = useChatStore((s) => s.sendingSessionId !== null);
   const [data, setData] = useState<ModelsResponse | null>(null);
 
   const load = useCallback(() => {
