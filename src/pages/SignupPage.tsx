@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Anchor, Button, Divider, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { Anchor, Button, Divider, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { GoogleLogin } from '@react-oauth/google';
@@ -10,22 +10,31 @@ import { AuthShell } from '@/pages/AuthShell';
 export function SignupPage() {
   const signup = useAuthStore((s) => s.signup);
   const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const resendVerification = useAuthStore((s) => s.resendVerification);
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
   const form = useForm({
     initialValues: { name: '', email: '', password: '' },
     validate: {
       name: (v) => (v.trim().length >= 2 ? null : 'Enter your name'),
-      email: (v) => (/^\S+@\S+$/.test(v) ? null : 'Invalid email'),
+      email: (v) => {
+        const value = v.trim();
+        if (!value) return 'Email is required';
+        // local@domain.tld — no spaces, a dot in the domain, ≤254 chars.
+        const ok = value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        return ok ? null : 'Enter a valid email address';
+      },
       password: (v) => (v.length >= 8 ? null : 'Min 8 characters'),
     },
   });
 
   const submit = form.onSubmit(async (values) => {
     setBusy(true);
+    const email = values.email.trim().toLowerCase();
     try {
-      await signup(values);
-      void navigate('/dashboard');
+      await signup({ ...values, name: values.name.trim(), email });
+      setSentTo(email);
     } catch {
       notifications.show({ color: 'red', message: 'Could not sign up (email may be taken)' });
     } finally {
@@ -35,10 +44,37 @@ export function SignupPage() {
 
   const onGoogle = (credential?: string) => {
     if (!credential) return;
+    // Google accounts are pre-verified, so this logs straight in.
     loginWithGoogle(credential)
       .then(() => navigate('/dashboard'))
       .catch(() => notifications.show({ color: 'red', message: 'Google sign-in failed' }));
   };
+
+  const resend = () => {
+    if (!sentTo) return;
+    resendVerification(sentTo)
+      .then(() => notifications.show({ color: 'teal', message: 'Verification email sent' }))
+      .catch(() => notifications.show({ color: 'red', message: 'Could not resend' }));
+  };
+
+  if (sentTo) {
+    return (
+      <AuthShell title="Check your email" tagline="One quick step to activate your account.">
+        <Stack>
+          <Text size="sm">
+            We sent a verification link to <strong>{sentTo}</strong>. Open it to verify your email,
+            then log in. The link expires in 24 hours.
+          </Text>
+          <Button variant="light" onClick={resend}>
+            Resend email
+          </Button>
+          <Anchor component={Link} to="/login" size="sm" ta="center">
+            Back to log in
+          </Anchor>
+        </Stack>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell

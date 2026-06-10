@@ -10,6 +10,8 @@ interface AuthStore {
   login: (data: { email: string; password: string }) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
+  verifyEmail: (token: string) => Promise<void>;
+  resendVerification: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set) => {
@@ -40,9 +42,9 @@ export const useAuthStore = create<AuthStore>((set) => {
       }
     },
 
+    // Hard gate: signup does NOT log in — the user must verify their email first.
     signup: async (body) => {
-      const { data } = await api.post<TokenResponse>('/auth/signup', body);
-      await finishAuth(data.accessToken);
+      await api.post('/auth/signup', body);
     },
 
     login: async (body) => {
@@ -59,6 +61,14 @@ export const useAuthStore = create<AuthStore>((set) => {
       await api.post('/auth/logout');
       setAccessToken(null);
       set({ user: null });
+    },
+
+    verifyEmail: async (token) => {
+      await api.post('/auth/verify-email', { token });
+    },
+
+    resendVerification: async (email) => {
+      await api.post('/auth/resend-verification', { email });
     },
   };
 });
