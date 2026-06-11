@@ -26,13 +26,13 @@ export function ModelPicker() {
   };
 
   return (
-    <Group gap="xs" align="center" wrap="nowrap">
-      <Text size="xs" c="dimmed">
+    <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0 }}>
+      <Text size="xs" c="dimmed" visibleFrom="sm">
         Model
       </Text>
       <Select
         size="xs"
-        w={210}
+        w={{ base: 150, sm: 210 }}
         value={data.current}
         onChange={onChange}
         allowDeselect={false}
@@ -41,8 +41,9 @@ export function ModelPicker() {
           label: `${m.label}${m.rateLimited ? ' ⚠' : ''}`,
         }))}
       />
+      {/* Status + usage are detail; hide on phones to keep the header tidy. */}
       {current ? (
-        <Group gap="xs" wrap="nowrap">
+        <Group gap="xs" wrap="nowrap" visibleFrom="md">
           <Badge variant="light" color={current.rateLimited ? 'red' : 'teal'}>
             {current.rateLimited ? 'Rate-limited today' : 'Available'}
           </Badge>

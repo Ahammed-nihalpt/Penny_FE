@@ -125,6 +125,20 @@ const AlertIcon = () => (
   </svg>
 );
 
+const PlusIcon = () => (
+  <svg
+    width={18}
+    height={18}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.2}
+    strokeLinecap="round"
+  >
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
 export function CopilotPage() {
   const sessions = useChatStore((s) => s.sessions);
   const activeId = useChatStore((s) => s.activeId);
@@ -292,7 +306,7 @@ export function CopilotPage() {
         }}
       >
         <Group justify="space-between" align="center" wrap="nowrap" px="md" py="sm" bg="copper.0">
-          <Group gap={10} wrap="nowrap">
+          <Group gap={10} wrap="nowrap" style={{ minWidth: 0 }}>
             <Burger
               opened={navOpen}
               onClick={openNav}
@@ -319,12 +333,24 @@ export function CopilotPage() {
               <Text fw={700} size="sm" lh={1.15}>
                 Penny
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" c="dimmed" visibleFrom="sm">
                 Invoice copilot · ready
               </Text>
             </div>
           </Group>
-          <ModelPicker />
+          <Group gap="xs" wrap="nowrap">
+            <ActionIcon
+              variant="subtle"
+              color="teal"
+              size="lg"
+              hiddenFrom="sm"
+              aria-label="New chat"
+              onClick={() => void newChat()}
+            >
+              <PlusIcon />
+            </ActionIcon>
+            <ModelPicker />
+          </Group>
         </Group>
         <Divider />
 
